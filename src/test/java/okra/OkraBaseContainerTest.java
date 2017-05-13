@@ -45,13 +45,19 @@ public abstract class OkraBaseContainerTest {
             new GenericContainer("mongo:3.4")
                     .withExposedPorts(27017);
 
-    static Okra<DefaultOkraItem> okraSpringMongo32;
-    static Okra<DefaultOkraItem> okraSpringMongo34;
+    static Okra<DefaultOkraItem> okraSimpleMongo32;
+    static Okra<DefaultOkraItem> okraSimpleMongo34;
+
+    public static MongoClient getDefaultMongo() {
+        return new MongoClient(
+                mongo34Container.getContainerIpAddress(),
+                mongo34Container.getMappedPort(27017));
+    }
 
     @BeforeClass
     public static void init() throws UnknownHostException {
-        okraSpringMongo32 = prepareDefaultMongo32OkraSpring();
-        okraSpringMongo34 = prepareDefaultMongo34OkraSpring();
+        okraSimpleMongo32 = prepareDefaultMongo32OkraSpring();
+        okraSimpleMongo34 = prepareDefaultMongo34OkraSpring();
     }
 
     public static Okra<DefaultOkraItem> prepareDefaultMongo32OkraSpring() throws UnknownHostException {
@@ -69,12 +75,8 @@ public abstract class OkraBaseContainerTest {
     }
 
     public static Okra<DefaultOkraItem> prepareDefaultMongo34OkraSpring() throws UnknownHostException {
-        MongoClient client = new MongoClient(
-                mongo34Container.getContainerIpAddress(),
-                mongo34Container.getMappedPort(27017));
-
         return new OkraSimpleBuilder<DefaultOkraItem>()
-                .withMongoTemplate(client)
+                .withMongoTemplate(getDefaultMongo())
                 .withDatabase("okraSimpleTests")
                 .withCollection("okraSimple")
                 .withExpiration(5, TimeUnit.MINUTES)
@@ -83,6 +85,6 @@ public abstract class OkraBaseContainerTest {
     }
 
     public Okra<DefaultOkraItem> getDefaultOkra() {
-        return okraSpringMongo32;
+        return okraSimpleMongo34;
     }
 }

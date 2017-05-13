@@ -7,7 +7,9 @@ import com.mongodb.client.model.ReturnDocument;
 import okra.base.AbstractOkra;
 import okra.base.OkraItem;
 import okra.base.OkraStatus;
+import okra.exception.InvalidOkraItemException;
 import okra.exception.OkraItemNotFoundException;
+import okra.index.IndexCreator;
 import okra.utils.DateUtils;
 import okra.utils.QueryUtils;
 import org.bson.Document;
@@ -40,6 +42,12 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
         this.mongo = mongo;
         this.scheduleItemClass = scheduleItemClass;
         this.defaultHeartbeatExpirationMillis = defaultHeartbeatExpirationUnit.toMillis(defaultHeartbeatExpiration);
+        setup();
+    }
+
+    @Override
+    public void setup() {
+        IndexCreator.ensureIndexes(this, mongo, getDatabase(), getCollection());
     }
 
     @Override
@@ -127,6 +135,9 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
 
     @Override
     public void schedule(T item) {
+
+        validateSchedule(item);
+
         Document doc = new Document();
         doc.append("status", OkraStatus.PENDING.name());
         doc.append("runDate", DateUtils.localDateTimeToDate(item.getRunDate()));
@@ -135,6 +146,14 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
                 .getDatabase(getDatabase())
                 .getCollection(getCollection())
                 .insertOne(doc);
+    }
+
+    private void validateSchedule(T item) {
+        if (item == null
+                || item.getRunDate() == null
+                || item.getId() != null) {
+            throw new InvalidOkraItemException();
+        }
     }
 
     @Override

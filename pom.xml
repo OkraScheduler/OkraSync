@@ -16,7 +16,7 @@
         <dependency>
             <groupId>com.github.OkraScheduler</groupId>
             <artifactId>OkraApi</artifactId>
-            <version>1.1.1</version>
+            <version>1.2.0</version>
         </dependency>
 
         <dependency>
@@ -30,6 +30,7 @@
             <artifactId>lombok</artifactId>
             <version>1.16.12</version>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -38,7 +39,11 @@
             <version>3.6.1</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.22</version>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
