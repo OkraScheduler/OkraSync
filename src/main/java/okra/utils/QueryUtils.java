@@ -38,24 +38,25 @@ public class QueryUtils {
         return runDateQuery;
     }
 
-    public static BasicDBObject generateHeartbeatExpiredOrNullQueryPart(long secondsToGetExpired) {
-        BasicDBList heartBeatOrNullValues = new BasicDBList();
-        heartBeatOrNullValues.add(new BasicDBObject("heartbeat", getExpiredHeartbeatDate(secondsToGetExpired)));
-        heartBeatOrNullValues.add(new BasicDBObject("heartbeat", null));
-        return new BasicDBObject("$or", heartBeatOrNullValues);
+    public static BasicDBObject generateStatusProcessingAndHeartbeatExpiredQuery(long secondsToGetExpired) {
+        BasicDBObject statusProcessingAndHeartbeatExpired = new BasicDBObject();
+        statusProcessingAndHeartbeatExpired.put("status", OkraStatus.PROCESSING.name());
+        statusProcessingAndHeartbeatExpired.put("heartbeat", getExpiredHeartbeatDate(secondsToGetExpired));
+        return statusProcessingAndHeartbeatExpired;
     }
 
-    public static BasicDBObject generateStatusProcessingAndExpiredHeartbeatQuery(long secondsToGetExpired) {
-        BasicDBList heartbeatQueryAndValues = new BasicDBList();
-        heartbeatQueryAndValues.add(new BasicDBObject("status", OkraStatus.PROCESSING.name()));
-        heartbeatQueryAndValues.add(QueryUtils.generateHeartbeatExpiredOrNullQueryPart(secondsToGetExpired));
-        return new BasicDBObject("$and", heartbeatQueryAndValues);
+    private static BasicDBObject generateStatusProcessingAndHeartbeatNullQuery() {
+        BasicDBObject statusProcessingAndHeartbeatNull = new BasicDBObject();
+        statusProcessingAndHeartbeatNull.put("status", OkraStatus.PROCESSING.name());
+        statusProcessingAndHeartbeatNull.put("heartbeat", null);
+        return statusProcessingAndHeartbeatNull;
     }
 
     public static BasicDBObject generatePeekQuery(long secondsToGetExpired) {
         BasicDBList orValues = new BasicDBList();
         orValues.add(QueryUtils.generateRunDateQueryPart());
-        orValues.add(QueryUtils.generateStatusProcessingAndExpiredHeartbeatQuery(secondsToGetExpired));
+        orValues.add(QueryUtils.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired));
+        orValues.add(QueryUtils.generateStatusProcessingAndHeartbeatNullQuery());
         return new BasicDBObject("$or", orValues);
     }
 
