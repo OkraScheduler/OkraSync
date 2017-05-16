@@ -100,10 +100,15 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
         if (result == null) {
             return Optional.empty();
         }
+        T okraItem = documentToOkraItem(result);
+        return Optional.ofNullable(okraItem);
+    }
 
+    private T documentToOkraItem(Document result) {
+        T okraItem = null;
         try {
+            okraItem = scheduleItemClass.newInstance();
             ObjectId objId = result.getObjectId("_id");
-            T okraItem = scheduleItemClass.newInstance();
             okraItem.setId(objId.toString());
 
             Date heartBeat = result.getDate("heartbeat");
@@ -114,13 +119,10 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
 
             String status = result.getString("status");
             okraItem.setStatus(OkraStatus.valueOf(status));
-
-            return Optional.of(okraItem);
         } catch (InstantiationException | IllegalAccessException e) {
             LOGGER.error("Error initializing Okra Item instance", e);
         }
-
-        return Optional.empty();
+        return okraItem;
     }
 
     private LocalDateTime dateToLocalDateTime(Date heartBeat) {
@@ -140,7 +142,38 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
 
     @Override
     public Optional<T> heartbeat(T item) {
-        return null;
+        validateHeartbeat(item);
+
+        Document query = new Document();
+        query.put("_id", new ObjectId(item.getId()));
+        query.put("status", OkraStatus.PROCESSING.name());
+        query.put("heartbeat", DateUtils.localDateTimeToDate(item.getHeartbeat()));
+
+        Document update = new Document();
+        update.put("$set", new Document("heartbeat", new Date()));
+
+        FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
+        options.returnDocument(ReturnDocument.AFTER);
+
+        Document result = mongo
+                .getDatabase(getDatabase())
+                .getCollection(getCollection())
+                .findOneAndUpdate(query, update, options);
+
+        if (result != null) {
+            T retrievedItem = documentToOkraItem(result);
+            return Optional.ofNullable(retrievedItem);
+        }
+
+        return Optional.empty();
+    }
+
+    private void validateHeartbeat(T item) {
+        if (item.getId() == null
+                || item.getHeartbeat() == null
+                || item.getStatus() == null) {
+            throw new InvalidOkraItemException();
+        }
     }
 
     @Override
