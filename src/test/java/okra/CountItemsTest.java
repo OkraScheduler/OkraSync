@@ -34,15 +34,12 @@ public class CountItemsTest extends OkraBaseContainerTest {
 
     @Test
     public void countPendingItemsTest() {
-
         DefaultOkraItem item = new DefaultOkraItem();
         item.setRunDate(LocalDateTime.now().minusHours(1));
 
         getDefaultOkra().schedule(item);
 
-        long count = getDefaultOkra().countByStatus(OkraStatus.PENDING);
-
+        final long count = getDefaultOkra().countByStatus(OkraStatus.PENDING);
         assertThat(count).isEqualTo(1);
     }
-
 }

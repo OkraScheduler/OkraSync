@@ -77,5 +77,4 @@ public class HeartbeatTest extends OkraBaseContainerTest {
         Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
         assertThat(hbItem).isNotPresent();
     }
-
 }
