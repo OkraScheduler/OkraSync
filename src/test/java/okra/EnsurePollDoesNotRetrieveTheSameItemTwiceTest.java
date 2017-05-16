@@ -34,38 +34,27 @@ public class EnsurePollDoesNotRetrieveTheSameItemTwiceTest extends OkraBaseConta
 
     @Test
     public void ensurePeekDoesNotRetrieveTheSameItemTwiceTest() {
-        given_that_an_item_was_scheduled();
+        final DefaultOkraItem persistedItem = new DefaultOkraItem();
+        persistedItem.setRunDate(LocalDateTime.now().minusNanos(100));
+        getDefaultOkra().schedule(persistedItem);
 
-        Optional<DefaultOkraItem> retrievedOpt = getDefaultOkra().peek();
-
+        final Optional<DefaultOkraItem> retrievedOpt = getDefaultOkra().peek();
         assertThat(retrievedOpt.isPresent()).isTrue();
 
-        DefaultOkraItem item = retrievedOpt.get();
+        final DefaultOkraItem item = retrievedOpt.get();
 
-        database_should_contain_at_least_one_processing_item();
-
-        Optional<DefaultOkraItem> optThatShouldBeEmpty = getDefaultOkra().peek();
-
-        assertThat(optThatShouldBeEmpty.isPresent()).isFalse();
-
-        // Then... Delete acquired item
-        getDefaultOkra().delete(item);
-    }
-
-    private void database_should_contain_at_least_one_processing_item() {
-        long processingItemsCount = getDefaultOkra().countByStatus(OkraStatus.PROCESSING);
+        final long processingItemsCount = getDefaultOkra().countByStatus(OkraStatus.PROCESSING);
         assertThat(processingItemsCount).isEqualTo(1L);
 
-        long pendingItemsCount = getDefaultOkra().countByStatus(OkraStatus.PENDING);
+        final long pendingItemsCount = getDefaultOkra().countByStatus(OkraStatus.PENDING);
         assertThat(pendingItemsCount).isEqualTo(0L);
 
-        long doneItemsCount = getDefaultOkra().countByStatus(OkraStatus.DONE);
+        final long doneItemsCount = getDefaultOkra().countByStatus(OkraStatus.DONE);
         assertThat(doneItemsCount).isEqualTo(0L);
-    }
 
-    private void given_that_an_item_was_scheduled() {
-        DefaultOkraItem item = new DefaultOkraItem();
-        item.setRunDate(LocalDateTime.now().minusNanos(100));
-        getDefaultOkra().schedule(item);
+        final Optional<DefaultOkraItem> optThatShouldBeEmpty = getDefaultOkra().peek();
+        assertThat(optThatShouldBeEmpty.isPresent()).isFalse();
+
+        getDefaultOkra().delete(item);
     }
 }
