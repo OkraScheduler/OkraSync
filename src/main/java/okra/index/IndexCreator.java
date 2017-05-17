@@ -30,7 +30,7 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IndexCreator {
+public final class IndexCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexCreator.class);
 

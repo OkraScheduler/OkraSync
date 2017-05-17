@@ -29,7 +29,7 @@ import okra.base.OkraStatus;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class QueryUtils {
+public final class QueryUtils {
 
     public static BasicDBObject generateRunDateQueryPart() {
         BasicDBObject runDateQuery = new BasicDBObject();
@@ -38,7 +38,7 @@ public class QueryUtils {
         return runDateQuery;
     }
 
-    public static BasicDBObject generateStatusProcessingAndHeartbeatExpiredQuery(long secondsToGetExpired) {
+    public static BasicDBObject generateStatusProcessingAndHeartbeatExpiredQuery(final long secondsToGetExpired) {
         BasicDBObject statusProcessingAndHeartbeatExpired = new BasicDBObject();
         statusProcessingAndHeartbeatExpired.put("status", OkraStatus.PROCESSING.name());
         statusProcessingAndHeartbeatExpired.put("heartbeat", getExpiredHeartbeatDate(secondsToGetExpired));
@@ -52,7 +52,7 @@ public class QueryUtils {
         return statusProcessingAndHeartbeatNull;
     }
 
-    public static BasicDBObject generatePeekQuery(long secondsToGetExpired) {
+    public static BasicDBObject generatePeekQuery(final long secondsToGetExpired) {
         BasicDBList orValues = new BasicDBList();
         orValues.add(QueryUtils.generateRunDateQueryPart());
         orValues.add(QueryUtils.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired));
@@ -60,7 +60,7 @@ public class QueryUtils {
         return new BasicDBObject("$or", orValues);
     }
 
-    private static Date getExpiredHeartbeatDate(long secondsToGetExpired) {
+    private static Date getExpiredHeartbeatDate(final long secondsToGetExpired) {
         return DateUtils.localDateTimeToDate(LocalDateTime.now().minusSeconds(secondsToGetExpired));
     }
 

@@ -22,14 +22,15 @@
 
 package okra.utils;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
+import org.junit.Test;
 
-public final class DateUtils {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    public static Date localDateTimeToDate(final LocalDateTime localDateTime) {
-        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+public class QueryUtilsTest {
+
+    @Test
+    public void newInstanceTest() {
+        assertThat(new QueryUtils()).isNotNull();
     }
 
 }

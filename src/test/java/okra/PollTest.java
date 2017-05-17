@@ -20,16 +20,39 @@
  * SOFTWARE.
  */
 
-package okra.utils;
+package okra;
+
+import okra.base.OkraStatus;
+import okra.model.DefaultOkraItem;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
+import java.util.Optional;
 
-public final class DateUtils {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    public static Date localDateTimeToDate(final LocalDateTime localDateTime) {
-        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+public class PollTest extends OkraBaseContainerTest {
+
+    @Test
+    public void pollTest() {
+        // Given a scheduled and delayed item...
+        DefaultOkraItem item = new DefaultOkraItem();
+        item.setRunDate(LocalDateTime.now().minusHours(1));
+        getDefaultOkra().schedule(item);
+
+        // When we poll the item...
+        Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().poll();
+
+        // Item should be present
+        assertThat(retrievedItemOpt).isPresent();
+
+        // But okra should not have any pending items
+        assertThat(getDefaultOkra().countByStatus(OkraStatus.PENDING)).isEqualTo(0L);
+
+        // Neither any processing items
+        assertThat(getDefaultOkra().countByStatus(OkraStatus.PROCESSING)).isEqualTo(0L);
+
+        // And peek, of course, should not retrieve any items
+        assertThat(getDefaultOkra().peek()).isNotPresent();
     }
-
 }
