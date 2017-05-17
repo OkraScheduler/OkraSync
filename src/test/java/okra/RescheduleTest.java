@@ -23,6 +23,7 @@
 package okra;
 
 import okra.base.OkraStatus;
+import okra.exception.InvalidOkraItemException;
 import okra.model.DefaultOkraItem;
 import org.junit.Test;
 
@@ -61,6 +62,54 @@ public class RescheduleTest extends OkraBaseContainerTest {
         // And no delayed items! :)
         OkraSimple<DefaultOkraItem> okra = (OkraSimple<DefaultOkraItem>) getDefaultOkra();
         assertThat(okra.countDelayed()).isEqualTo(0);
+
+        // Let's remove the item to clear the database...
+        getDefaultOkra().delete(retrievedItem.get());
+    }
+
+    @Test
+    public void invalidRescheduleTest() {
+        // Given a scheduled AND delayed item...
+        DefaultOkraItem item = new DefaultOkraItem();
+        item.setRunDate(LocalDateTime.now().minusHours(1));
+        getDefaultOkra().schedule(item);
+
+        // peek the item...
+        Optional<DefaultOkraItem> retrievedItem = getDefaultOkra().peek();
+
+        // It should be present, of course...
+        assertThat(retrievedItem).isPresent();
+
+        // Now let's try to reschedule it to 1 hour from now...
+        retrievedItem.get().setRunDate(LocalDateTime.now().plusHours(1));
+
+        // Rescheduling should not be successful because heartbeat has changed...
+        retrievedItem.get().setHeartbeat(LocalDateTime.now());
+        Optional<DefaultOkraItem> rescheduleResult = getDefaultOkra().reschedule(retrievedItem.get());
+
+        // Reschedule was not successful, right?
+        assertThat(rescheduleResult).isNotPresent();
+
+        // Peek should not return any items now because the item should be marked as PROCESSING...
+        assertThat(getDefaultOkra().peek()).isNotPresent();
+
+        // But okra should not have 1 pending item.
+        assertThat(getDefaultOkra().countByStatus(OkraStatus.PENDING)).isEqualTo(0L);
+
+        // And have 1 PROCESSING item
+        assertThat(getDefaultOkra().countByStatus(OkraStatus.PROCESSING)).isEqualTo(1L);
+
+        // And no delayed items! :)
+        OkraSimple<DefaultOkraItem> okra = (OkraSimple<DefaultOkraItem>) getDefaultOkra();
+        assertThat(okra.countDelayed()).isEqualTo(0);
+
+        // Lets delete the item to clear the database
+        getDefaultOkra().delete(retrievedItem.get());
+    }
+
+    @Test(expected = InvalidOkraItemException.class)
+    public void rescheduleShouldFailIfItemIsNotValid() {
+        getDefaultOkra().reschedule(null);
     }
 
 }
