@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package okra;
 
 import okra.base.OkraStatus;
@@ -30,31 +31,36 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EnsurePollDoesNotRetrieveTheSameItemTwiceTest extends OkraBaseContainerTest {
+public class RescheduleTest extends OkraBaseContainerTest {
 
     @Test
-    public void ensurePeekDoesNotRetrieveTheSameItemTwiceTest() {
-        final DefaultOkraItem persistedItem = new DefaultOkraItem();
-        persistedItem.setRunDate(LocalDateTime.now().minusNanos(100));
-        getDefaultOkra().schedule(persistedItem);
+    public void rescheduleTest() {
+        // Given a scheduled AND delayed item...
+        DefaultOkraItem item = new DefaultOkraItem();
+        item.setRunDate(LocalDateTime.now().minusHours(1));
+        getDefaultOkra().schedule(item);
 
-        final Optional<DefaultOkraItem> retrievedOpt = getDefaultOkra().peek();
-        assertThat(retrievedOpt.isPresent()).isTrue();
+        // peek the item...
+        Optional<DefaultOkraItem> retrievedItem = getDefaultOkra().peek();
 
-        final DefaultOkraItem item = retrievedOpt.get();
+        // It should be present, of course...
+        assertThat(retrievedItem).isPresent();
 
-        final long processingItemsCount = getDefaultOkra().countByStatus(OkraStatus.PROCESSING);
-        assertThat(processingItemsCount).isEqualTo(1L);
+        // Now let's try to reschedule it to 1 hour from now...
+        retrievedItem.get().setRunDate(LocalDateTime.now().plusHours(1));
 
-        final long pendingItemsCount = getDefaultOkra().countByStatus(OkraStatus.PENDING);
-        assertThat(pendingItemsCount).isEqualTo(0L);
+        // Rescheduling...
+        getDefaultOkra().reschedule(retrievedItem.get());
 
-        final long doneItemsCount = getDefaultOkra().countByStatus(OkraStatus.DONE);
-        assertThat(doneItemsCount).isEqualTo(0L);
+        // Peek should not return any items now...
+        assertThat(getDefaultOkra().peek()).isNotPresent();
 
-        final Optional<DefaultOkraItem> optThatShouldBeEmpty = getDefaultOkra().peek();
-        assertThat(optThatShouldBeEmpty.isPresent()).isFalse();
+        // But okra should have 1 pending item.
+        assertThat(getDefaultOkra().countByStatus(OkraStatus.PENDING)).isEqualTo(1L);
 
-        getDefaultOkra().delete(item);
+        // And no delayed items! :)
+        OkraSimple<DefaultOkraItem> okra = (OkraSimple<DefaultOkraItem>) getDefaultOkra();
+        assertThat(okra.countDelayed()).isEqualTo(0);
     }
+
 }

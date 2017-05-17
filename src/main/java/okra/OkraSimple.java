@@ -112,7 +112,9 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
             okraItem.setId(objId.toString());
 
             Date heartBeat = result.getDate("heartbeat");
-            okraItem.setHeartbeat(dateToLocalDateTime(heartBeat));
+            if (heartBeat != null) {
+                okraItem.setHeartbeat(dateToLocalDateTime(heartBeat));
+            }
 
             Date runDate = result.getDate("runDate");
             okraItem.setRunDate(dateToLocalDateTime(runDate));
@@ -137,7 +139,44 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
 
     @Override
     public Optional<T> reschedule(T item) {
-        return null;
+        validateReschedule(item);
+
+        Document query = new Document();
+        query.put("_id", new ObjectId(item.getId()));
+        query.put("heartbeat", DateUtils.localDateTimeToDate(item.getHeartbeat()));
+
+        Document setDoc = new Document();
+        setDoc.put("heartbeat", null);
+        setDoc.put("runDate", DateUtils.localDateTimeToDate(item.getRunDate()));
+        setDoc.put("status", OkraStatus.PENDING.name());
+
+        Document update = new Document();
+        update.put("$set", setDoc);
+
+        FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
+        options.returnDocument(ReturnDocument.AFTER);
+
+        Document rescheduledItem = mongo
+                .getDatabase(getDatabase())
+                .getCollection(getCollection())
+                .findOneAndUpdate(query, update, options);
+
+        if (rescheduledItem != null) {
+            T parsedItem = documentToOkraItem(rescheduledItem);
+            return Optional.of(parsedItem);
+        } else {
+            return Optional.empty();
+        }
+
+    }
+
+    private void validateReschedule(T item) {
+        if (item == null
+                || item.getHeartbeat() == null
+                || item.getRunDate() == null
+                || item.getId() == null) {
+            throw new InvalidOkraItemException();
+        }
     }
 
     @Override
@@ -214,6 +253,18 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
     @Override
     public long countByStatus(OkraStatus status) {
         BasicDBObject query = new BasicDBObject("status", status.name());
+
+        return mongo
+                .getDatabase(getDatabase())
+                .getCollection(getCollection())
+                .count(query);
+    }
+
+    public long countDelayed() {
+        Document query = new Document();
+
+        query.put("status", OkraStatus.PENDING.name());
+        query.put("runDate", new Document("$lt", DateUtils.localDateTimeToDate(LocalDateTime.now())));
 
         return mongo
                 .getDatabase(getDatabase())
