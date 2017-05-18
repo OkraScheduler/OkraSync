@@ -134,7 +134,11 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
     @Override
     public T retrieve() throws OkraItemNotFoundException {
         Optional<T> result = peek();
-        return null;
+
+        if (!result.isPresent()) {
+            throw new OkraItemNotFoundException();
+        }
+        return result.get();
     }
 
     @Override
@@ -229,7 +233,6 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
 
     @Override
     public void schedule(T item) {
-
         validateSchedule(item);
 
         Document doc = new Document();
