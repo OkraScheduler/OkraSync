@@ -19,45 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package okra;
 
 import com.mongodb.MongoClient;
-import okra.base.Okra;
 import okra.builder.OkraSimpleBuilder;
-import okra.model.DefaultOkraItem;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.testcontainers.containers.GenericContainer;
+import okra.exception.InvalidOkraConfigurationException;
+import org.junit.Test;
 
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeUnit;
+public class BuilderTest {
 
-public abstract class OkraBaseContainerTest {
+    @Test(expected = InvalidOkraConfigurationException.class)
+    public void builderMongoNullTest() {
 
-    @ClassRule
-    public static GenericContainer mongoContainer = new GenericContainer("mongo:3.4").withExposedPorts(27017);
-
-    private Okra<DefaultOkraItem> okraSimple;
-
-    @Before
-    public void setUp() throws UnknownHostException {
-        okraSimple = new OkraSimpleBuilder<DefaultOkraItem>()
-                .withMongo(getDefaultMongo())
-                .withDatabase("okraSimpleTests")
-                .withCollection("okraSimple")
-                .withExpiration(5, TimeUnit.MINUTES)
-                .withItemClass(DefaultOkraItem.class)
+        new OkraSimpleBuilder()
+                .withCollection("myCollection")
                 .build();
+
     }
 
-    public MongoClient getDefaultMongo() {
-        return new MongoClient(
-                mongoContainer.getContainerIpAddress(),
-                mongoContainer.getMappedPort(27017)
-        );
+    @Test(expected = InvalidOkraConfigurationException.class)
+    public void builderDatabaseNullTest() {
+
+        new OkraSimpleBuilder()
+                .withMongo(new MongoClient())
+                .withCollection("myCollection")
+                .withDatabase(null)
+                .build();
+
     }
 
-    public Okra<DefaultOkraItem> getDefaultOkra() {
-        return okraSimple;
+    @Test(expected = InvalidOkraConfigurationException.class)
+    public void builderDatabaseEmptyTest() {
+
+        new OkraSimpleBuilder()
+                .withMongo(new MongoClient())
+                .withCollection("myCollection")
+                .withDatabase("")
+                .build();
+
     }
+
 }

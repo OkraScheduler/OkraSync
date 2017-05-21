@@ -56,7 +56,7 @@ public class OkraSimpleBuilder<T extends OkraItem> extends OkraBuilder<T> {
      * @param mongoClient the mongo template
      * @return this builder
      */
-    public OkraSimpleBuilder<T> withMongoTemplate(final MongoClient mongoClient) {
+    public OkraSimpleBuilder<T> withMongo(final MongoClient mongoClient) {
         this.mongoClient = Preconditions.checkConfigurationNotNull(mongoClient, "mongoClient");
         return this;
     }
@@ -66,7 +66,9 @@ public class OkraSimpleBuilder<T extends OkraItem> extends OkraBuilder<T> {
                 || getCollection() == null
                 || getCollection().isEmpty()
                 || getDatabase() == null
-                || getDatabase().isEmpty()) {
+                || getDatabase().isEmpty()
+                || getExpireDuration() == null
+                || getExpireDurationUnit() == null) {
 
             LOGGER.error("Invalid MongoScheduler configuration. " +
                             "Please verify params: " +
