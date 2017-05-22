@@ -31,6 +31,7 @@ import okra.base.OkraItem;
 import okra.base.OkraStatus;
 import okra.exception.InvalidOkraItemException;
 import okra.exception.OkraItemNotFoundException;
+import okra.exception.OkraRuntimeException;
 import okra.index.IndexCreator;
 import okra.utils.DateUtils;
 import okra.utils.QueryUtils;
@@ -221,7 +222,7 @@ public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
 
     @Override
     public Optional<T> heartbeatAndUpdateCustomAttrs(T item, Map<String, Object> attrs) {
-        return null;
+        throw new OkraRuntimeException("Method not implemented yet");
     }
 
     @Override
