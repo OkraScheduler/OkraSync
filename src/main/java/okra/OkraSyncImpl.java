@@ -22,7 +22,6 @@
 
 package okra;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
@@ -36,6 +35,7 @@ import okra.index.IndexCreator;
 import okra.utils.DateUtils;
 import okra.utils.QueryUtils;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,9 +84,9 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
     @Override
     public Optional<T> peek() {
-        BasicDBObject peekQuery = QueryUtils.generatePeekQuery(defaultHeartbeatExpirationMillis);
+        Bson peekQuery = QueryUtils.generatePeekQuery(defaultHeartbeatExpirationMillis);
 
-        BasicDBObject update = new BasicDBObject();
+        Document update = new Document();
         update.put("heartbeat", new Date());
         update.put("status", OkraStatus.PROCESSING.name());
 
@@ -96,7 +96,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         Document result = mongo
                 .getDatabase(getDatabase())
                 .getCollection(getCollection())
-                .findOneAndUpdate(peekQuery, new BasicDBObject("$set", update), options);
+                .findOneAndUpdate(peekQuery, new Document("$set", update), options);
 
         if (result == null) {
             return Optional.empty();
@@ -228,7 +228,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     @Override
     public void delete(T item) {
         ObjectId id = new ObjectId(item.getId());
-        BasicDBObject idQuery = new BasicDBObject("_id", id);
+        Document idQuery = new Document("_id", id);
         mongo.getDatabase(getDatabase()).getCollection(getCollection()).deleteOne(idQuery);
     }
 
@@ -256,7 +256,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
     @Override
     public long countByStatus(OkraStatus status) {
-        BasicDBObject query = new BasicDBObject("status", status.name());
+        Document query = new Document("status", status.name());
 
         return mongo
                 .getDatabase(getDatabase())

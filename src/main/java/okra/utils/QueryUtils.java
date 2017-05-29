@@ -22,42 +22,44 @@
 
 package okra.utils;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import okra.base.OkraStatus;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import static com.mongodb.client.model.Filters.or;
+
 public final class QueryUtils {
 
-    public static BasicDBObject generateRunDateQueryPart() {
-        BasicDBObject runDateQuery = new BasicDBObject();
+    public static Document generateRunDateQueryPart() {
+        Document runDateQuery = new Document();
         runDateQuery.put("status", OkraStatus.PENDING.name());
         runDateQuery.put("runDate", new BasicDBObject("$lt", DateUtils.localDateTimeToDate(LocalDateTime.now())));
         return runDateQuery;
     }
 
-    public static BasicDBObject generateStatusProcessingAndHeartbeatExpiredQuery(final long secondsToGetExpired) {
-        BasicDBObject statusProcessingAndHeartbeatExpired = new BasicDBObject();
+    public static Document generateStatusProcessingAndHeartbeatExpiredQuery(final long secondsToGetExpired) {
+        Document statusProcessingAndHeartbeatExpired = new Document();
         statusProcessingAndHeartbeatExpired.put("status", OkraStatus.PROCESSING.name());
         statusProcessingAndHeartbeatExpired.put("heartbeat", getExpiredHeartbeatDate(secondsToGetExpired));
         return statusProcessingAndHeartbeatExpired;
     }
 
-    private static BasicDBObject generateStatusProcessingAndHeartbeatNullQuery() {
-        BasicDBObject statusProcessingAndHeartbeatNull = new BasicDBObject();
+    private static Document generateStatusProcessingAndHeartbeatNullQuery() {
+        Document statusProcessingAndHeartbeatNull = new Document();
         statusProcessingAndHeartbeatNull.put("status", OkraStatus.PROCESSING.name());
         statusProcessingAndHeartbeatNull.put("heartbeat", null);
         return statusProcessingAndHeartbeatNull;
     }
 
-    public static BasicDBObject generatePeekQuery(final long secondsToGetExpired) {
-        BasicDBList orValues = new BasicDBList();
-        orValues.add(QueryUtils.generateRunDateQueryPart());
-        orValues.add(QueryUtils.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired));
-        orValues.add(QueryUtils.generateStatusProcessingAndHeartbeatNullQuery());
-        return new BasicDBObject("$or", orValues);
+    public static Bson generatePeekQuery(final long secondsToGetExpired) {
+        return or(
+                QueryUtils.generateRunDateQueryPart(),
+                QueryUtils.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired),
+                QueryUtils.generateStatusProcessingAndHeartbeatNullQuery());
     }
 
     private static Date getExpiredHeartbeatDate(final long secondsToGetExpired) {
