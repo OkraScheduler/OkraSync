@@ -1,7 +1,7 @@
-# OkraSimple
+# OkraSync
 
-Okra implementation using MongoDB Java Driver.
-This is the fastest Okra implementation ever made.
+Okra implementation using synchronous MongoDB Java Driver.
+This is the fastest synchronous Okra implementation ever made.
 
 [![codecov](https://codecov.io/gh/OkraScheduler/OkraSimple/branch/master/graph/badge.svg)](https://codecov.io/gh/OkraScheduler/OkraSimple)
 
