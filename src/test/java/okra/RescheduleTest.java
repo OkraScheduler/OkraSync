@@ -60,7 +60,7 @@ public class RescheduleTest extends OkraBaseContainerTest {
         assertThat(getDefaultOkra().countByStatus(OkraStatus.PENDING)).isEqualTo(1L);
 
         // And no delayed items! :)
-        OkraSimple<DefaultOkraItem> okra = (OkraSimple<DefaultOkraItem>) getDefaultOkra();
+        OkraSyncImpl<DefaultOkraItem> okra = (OkraSyncImpl<DefaultOkraItem>) getDefaultOkra();
         assertThat(okra.countDelayed()).isEqualTo(0);
 
         // Let's remove the item to clear the database...
@@ -100,7 +100,7 @@ public class RescheduleTest extends OkraBaseContainerTest {
         assertThat(getDefaultOkra().countByStatus(OkraStatus.PROCESSING)).isEqualTo(1L);
 
         // And no delayed items! :)
-        OkraSimple<DefaultOkraItem> okra = (OkraSimple<DefaultOkraItem>) getDefaultOkra();
+        OkraSyncImpl<DefaultOkraItem> okra = (OkraSyncImpl<DefaultOkraItem>) getDefaultOkra();
         assertThat(okra.countDelayed()).isEqualTo(0);
 
         // Lets delete the item to clear the database

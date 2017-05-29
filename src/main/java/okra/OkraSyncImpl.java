@@ -26,7 +26,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
-import okra.base.AbstractOkra;
+import okra.base.AbstractOkraSync;
 import okra.base.OkraItem;
 import okra.base.OkraStatus;
 import okra.exception.InvalidOkraItemException;
@@ -47,20 +47,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-public class OkraSimple<T extends OkraItem> extends AbstractOkra<T> {
+public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OkraSimple.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(OkraSyncImpl.class);
 
     private final MongoClient mongo;
     private final Class<T> scheduleItemClass;
     private final long defaultHeartbeatExpirationMillis;
 
-    public OkraSimple(MongoClient mongo,
-                      String database,
-                      String collection,
-                      Class<T> scheduleItemClass,
-                      final long defaultHeartbeatExpiration,
-                      final TimeUnit defaultHeartbeatExpirationUnit) {
+    public OkraSyncImpl(MongoClient mongo,
+                        String database,
+                        String collection,
+                        Class<T> scheduleItemClass,
+                        final long defaultHeartbeatExpiration,
+                        final TimeUnit defaultHeartbeatExpirationUnit) {
         super(database, collection);
         this.mongo = mongo;
         this.scheduleItemClass = scheduleItemClass;

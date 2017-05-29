@@ -22,9 +22,8 @@
 package okra.builder;
 
 import com.mongodb.MongoClient;
-import okra.OkraSimple;
+import okra.OkraSyncImpl;
 import okra.Preconditions;
-import okra.base.AbstractOkra;
 import okra.base.OkraItem;
 import okra.exception.InvalidOkraConfigurationException;
 import org.slf4j.Logger;
@@ -37,10 +36,10 @@ public class OkraSimpleBuilder<T extends OkraItem> extends OkraBuilder<T> {
     private MongoClient mongoClient;
 
     @Override
-    public AbstractOkra<T> build() {
+    public OkraSyncImpl<T> build() {
         validateConfiguration();
 
-        return new OkraSimple<>(
+        return new OkraSyncImpl<>(
                 mongoClient,
                 getDatabase(),
                 getCollection(),

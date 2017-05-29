@@ -22,7 +22,7 @@
 package okra;
 
 import com.mongodb.MongoClient;
-import okra.base.Okra;
+import okra.base.OkraSync;
 import okra.builder.OkraSimpleBuilder;
 import okra.model.DefaultOkraItem;
 import org.junit.Before;
@@ -37,14 +37,14 @@ public abstract class OkraBaseContainerTest {
     @ClassRule
     public static GenericContainer mongoContainer = new GenericContainer("mongo:3.4").withExposedPorts(27017);
 
-    private Okra<DefaultOkraItem> okraSimple;
+    private OkraSync<DefaultOkraItem> okraSync;
 
     @Before
     public void setUp() throws UnknownHostException {
-        okraSimple = new OkraSimpleBuilder<DefaultOkraItem>()
+        okraSync = new OkraSimpleBuilder<DefaultOkraItem>()
                 .withMongo(getDefaultMongo())
                 .withDatabase("okraSimpleTests")
-                .withCollection("okraSimple")
+                .withCollection("okraSync")
                 .withExpiration(5, TimeUnit.MINUTES)
                 .withItemClass(DefaultOkraItem.class)
                 .build();
@@ -57,7 +57,7 @@ public abstract class OkraBaseContainerTest {
         );
     }
 
-    public Okra<DefaultOkraItem> getDefaultOkra() {
-        return okraSimple;
+    public OkraSync<DefaultOkraItem> getDefaultOkra() {
+        return okraSync;
     }
 }

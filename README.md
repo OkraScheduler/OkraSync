@@ -33,7 +33,7 @@ build.gradle
 
 ```groovy
     dependencies {
-        compile 'com.github.OkraScheduler:OkraSimple:x.y.z'
+        compile 'com.github.OkraScheduler:OkraSync:x.y.z'
     }
 ```
 
