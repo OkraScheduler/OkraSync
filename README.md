@@ -3,14 +3,14 @@
 Okra implementation using synchronous MongoDB Java Driver.
 This is the fastest synchronous Okra implementation ever made.
 
-[![codecov](https://codecov.io/gh/OkraScheduler/OkraSimple/branch/master/graph/badge.svg)](https://codecov.io/gh/OkraScheduler/OkraSimple)
+[![codecov](https://codecov.io/gh/OkraScheduler/OkraSync/branch/master/graph/badge.svg)](https://codecov.io/gh/OkraScheduler/OkraSync)
 
-[![Build Status](https://travis-ci.org/OkraScheduler/OkraSimple.svg?branch=master)](https://travis-ci.org/OkraScheduler/OkraSimple)
+[![Build Status](https://travis-ci.org/OkraScheduler/OkraSync.svg?branch=master)](https://travis-ci.org/OkraScheduler/OkraSync)
 
 ### Requirements
 
 * Java 8
-* MongoDB
+* MongoDB Synchronous Driver
 
 ### Note 
 
@@ -18,7 +18,7 @@ Pull Requests are always welcome! We will always review and accept them really f
 
 ### Binaries
 
-[![](https://jitpack.io/v/OkraScheduler/OkraSimple.svg)](https://jitpack.io/#OkraScheduler/OkraSimple)
+[![](https://jitpack.io/v/OkraScheduler/OkraSync.svg)](https://jitpack.io/#OkraScheduler/OkraSync)
 
 #### Gradle
 build.gradle
