@@ -23,7 +23,7 @@
 package okra.utils;
 
 import com.mongodb.BasicDBObject;
-import okra.base.OkraStatus;
+import okra.base.model.OkraStatus;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 

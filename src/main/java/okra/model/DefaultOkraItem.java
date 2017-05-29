@@ -23,8 +23,8 @@
 package okra.model;
 
 import lombok.Data;
-import okra.base.OkraItem;
-import okra.base.OkraStatus;
+import okra.base.model.OkraItem;
+import okra.base.model.OkraStatus;
 
 import java.time.LocalDateTime;
 

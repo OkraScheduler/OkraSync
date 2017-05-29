@@ -25,7 +25,7 @@ package okra.index;
 import com.mongodb.MongoClient;
 import com.mongodb.client.model.Indexes;
 import okra.base.Okra;
-import okra.base.OkraItem;
+import okra.base.model.OkraItem;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -22,9 +22,10 @@
 package okra;
 
 import com.mongodb.MongoClient;
-import okra.base.OkraSync;
+import okra.base.sync.OkraSync;
 import okra.builder.OkraSimpleBuilder;
 import okra.model.DefaultOkraItem;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.testcontainers.containers.GenericContainer;
@@ -38,9 +39,15 @@ public abstract class OkraBaseContainerTest {
     public static GenericContainer mongoContainer = new GenericContainer("mongo:3.4").withExposedPorts(27017);
 
     private OkraSync<DefaultOkraItem> okraSync;
+    private MongoClient mongoClient;
 
     @Before
     public void setUp() throws UnknownHostException {
+        mongoClient =
+                new MongoClient(
+                        mongoContainer.getContainerIpAddress(),
+                        mongoContainer.getMappedPort(27017)
+                );
         okraSync = new OkraSimpleBuilder<DefaultOkraItem>()
                 .withMongo(getDefaultMongo())
                 .withDatabase("okraSimpleTests")
@@ -51,10 +58,12 @@ public abstract class OkraBaseContainerTest {
     }
 
     public MongoClient getDefaultMongo() {
-        return new MongoClient(
-                mongoContainer.getContainerIpAddress(),
-                mongoContainer.getMappedPort(27017)
-        );
+        return mongoClient;
+    }
+
+    @After
+    public void shutdown() {
+        mongoClient.close();
     }
 
     public OkraSync<DefaultOkraItem> getDefaultOkra() {

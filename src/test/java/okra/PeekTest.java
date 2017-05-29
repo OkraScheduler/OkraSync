@@ -21,7 +21,7 @@
  */
 package okra;
 
-import okra.base.OkraStatus;
+import okra.base.model.OkraStatus;
 import okra.model.DefaultOkraItem;
 import org.junit.Test;
 
