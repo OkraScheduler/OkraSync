@@ -41,7 +41,7 @@ build.gradle
 ```xml
 	<dependency>
 	    <groupId>com.github.OkraScheduler</groupId>
-	    <artifactId>OkraSimple</artifactId>
+	    <artifactId>OkraSync</artifactId>
 	    <version>x.y.z</version>
 	</dependency>
 
