@@ -48,7 +48,7 @@ public abstract class OkraBaseContainerTest {
                         mongoContainer.getContainerIpAddress(),
                         mongoContainer.getMappedPort(27017)
                 );
-        okraSync = new OkraSyncBuilder<DefaultOkraItem>()
+        okraSync = (OkraSync<DefaultOkraItem>) new OkraSyncBuilder<DefaultOkraItem>()
                 .withMongo(getDefaultMongo())
                 .withDatabase("okraSimpleTests")
                 .withCollection("okraSync")
