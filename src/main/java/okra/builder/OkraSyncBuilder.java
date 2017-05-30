@@ -25,18 +25,19 @@ import com.mongodb.MongoClient;
 import okra.OkraSyncImpl;
 import okra.Preconditions;
 import okra.base.model.OkraItem;
+import okra.base.sync.OkraSync;
 import okra.exception.InvalidOkraConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OkraSimpleBuilder<T extends OkraItem> extends OkraBuilder<T> {
+public class OkraSyncBuilder<T extends OkraItem> extends OkraBuilder<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OkraSimpleBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OkraSyncBuilder.class);
 
     private MongoClient mongoClient;
 
     @Override
-    public OkraSyncImpl<T> build() {
+    public OkraSync<T> build() {
         validateConfiguration();
 
         return new OkraSyncImpl<>(
@@ -55,7 +56,7 @@ public class OkraSimpleBuilder<T extends OkraItem> extends OkraBuilder<T> {
      * @param mongoClient the mongo template
      * @return this builder
      */
-    public OkraSimpleBuilder<T> withMongo(final MongoClient mongoClient) {
+    public OkraSyncBuilder<T> withMongo(final MongoClient mongoClient) {
         this.mongoClient = Preconditions.checkConfigurationNotNull(mongoClient, "mongoClient");
         return this;
     }

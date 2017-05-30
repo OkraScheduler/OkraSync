@@ -23,7 +23,7 @@ package okra;
 
 import com.mongodb.MongoClient;
 import okra.base.sync.OkraSync;
-import okra.builder.OkraSimpleBuilder;
+import okra.builder.OkraSyncBuilder;
 import okra.model.DefaultOkraItem;
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +48,7 @@ public abstract class OkraBaseContainerTest {
                         mongoContainer.getContainerIpAddress(),
                         mongoContainer.getMappedPort(27017)
                 );
-        okraSync = new OkraSimpleBuilder<DefaultOkraItem>()
+        okraSync = new OkraSyncBuilder<DefaultOkraItem>()
                 .withMongo(getDefaultMongo())
                 .withDatabase("okraSimpleTests")
                 .withCollection("okraSync")

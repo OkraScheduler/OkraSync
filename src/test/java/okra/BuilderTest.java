@@ -23,7 +23,7 @@
 package okra;
 
 import com.mongodb.MongoClient;
-import okra.builder.OkraSimpleBuilder;
+import okra.builder.OkraSyncBuilder;
 import okra.exception.InvalidOkraConfigurationException;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class BuilderTest {
     @Test(expected = InvalidOkraConfigurationException.class)
     public void builderMongoNullTest() {
 
-        new OkraSimpleBuilder()
+        new OkraSyncBuilder()
                 .withCollection("myCollection")
                 .build();
 
@@ -41,7 +41,7 @@ public class BuilderTest {
     @Test(expected = InvalidOkraConfigurationException.class)
     public void builderDatabaseNullTest() {
 
-        new OkraSimpleBuilder()
+        new OkraSyncBuilder()
                 .withMongo(new MongoClient())
                 .withCollection("myCollection")
                 .withDatabase(null)
@@ -52,7 +52,7 @@ public class BuilderTest {
     @Test(expected = InvalidOkraConfigurationException.class)
     public void builderDatabaseEmptyTest() {
 
-        new OkraSimpleBuilder()
+        new OkraSyncBuilder()
                 .withMongo(new MongoClient())
                 .withCollection("myCollection")
                 .withDatabase("")
