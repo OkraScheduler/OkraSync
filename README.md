@@ -1,31 +1,28 @@
-# OkraSync
+# Okra
 
 Okra implementation using synchronous MongoDB Java Driver.
 This is the fastest synchronous Okra implementation ever made.
 
-[![codecov](https://codecov.io/gh/OkraScheduler/OkraSync/branch/master/graph/badge.svg)](https://codecov.io/gh/OkraScheduler/OkraSync)
+[![Build Status][travis-badge]][travis-url] [![Code Coverage][codecov-badge]][codecov-url] [![Artifacts][jitpack-badge]][jitpack-url]
 
-[![Build Status](https://travis-ci.org/OkraScheduler/OkraSync.svg?branch=master)](https://travis-ci.org/OkraScheduler/OkraSync)
-
-### Requirements
+## Requirements
 
 * Java 8
 * MongoDB Synchronous Driver
 
-### Note 
+## Note 
 
 Pull Requests are always welcome! We will always review and accept them really fast.
 
-### Binaries
+## Dependency
 
-[![](https://jitpack.io/v/OkraScheduler/OkraSync.svg)](https://jitpack.io/#OkraScheduler/OkraSync)
+### Gradle
 
-#### Gradle
 build.gradle
+
 ```groovy
     allprojects {
         repositories {
-            ...
             maven { url "https://jitpack.io" }
         }
     }
@@ -38,17 +35,25 @@ build.gradle
 ```
 
 #### Maven
-```xml
-	<dependency>
-	    <groupId>com.github.OkraScheduler</groupId>
-	    <artifactId>OkraSync</artifactId>
-	    <version>x.y.z</version>
-	</dependency>
 
-	<repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
+```xml
+    <dependency>
+        <groupId>com.github.OkraScheduler</groupId>
+        <artifactId>OkraSync</artifactId>
+        <version>x.y.z</version>
+    </dependency>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 ```
+
+[codecov-badge]: https://codecov.io/gh/OkraScheduler/OkraSync/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/OkraScheduler/OkraSync
+[travis-badge]: https://travis-ci.org/OkraScheduler/OkraSync.svg?branch=master
+[travis-url]: https://travis-ci.org/OkraScheduler/OkraSync
+[jitpack-badge]: https://jitpack.io/v/OkraScheduler/OkraSync.svg
+[jitpack-url]: https://jitpack.io/#OkraScheduler/OkraSync
