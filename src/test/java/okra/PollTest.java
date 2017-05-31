@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package okra;
 
 import okra.base.model.OkraStatus;
@@ -36,12 +35,12 @@ public class PollTest extends OkraBaseContainerTest {
     @Test
     public void pollTest() {
         // Given a scheduled and delayed item...
-        DefaultOkraItem item = new DefaultOkraItem();
+        final DefaultOkraItem item = new DefaultOkraItem();
         item.setRunDate(LocalDateTime.now().minusHours(1));
         getDefaultOkra().schedule(item);
 
         // When we poll the item...
-        Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().poll();
+        final Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().poll();
 
         // Item should be present
         assertThat(retrievedItemOpt).isPresent();

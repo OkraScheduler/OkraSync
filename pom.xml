@@ -38,7 +38,7 @@
         <dependency>
             <groupId>com.github.OkraScheduler</groupId>
             <artifactId>OkraApi</artifactId>
-            <version>1.4.3</version>
+            <version>1.4.5</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>

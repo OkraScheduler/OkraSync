@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package okra;
 
 import okra.exception.OkraItemNotFoundException;
@@ -35,12 +34,12 @@ public class RetrieveTest extends OkraBaseContainerTest {
     @Test
     public void retrieveHappyDayTest() throws OkraItemNotFoundException {
         // Given a scheduled item...
-        DefaultOkraItem item = new DefaultOkraItem();
+        final DefaultOkraItem item = new DefaultOkraItem();
         item.setRunDate(LocalDateTime.now().minusMinutes(5));
         getDefaultOkra().schedule(item);
 
         // When retrieve is executed...
-        DefaultOkraItem retrievedItem = getDefaultOkra().retrieve();
+        final DefaultOkraItem retrievedItem = getDefaultOkra().retrieve();
 
         // It should return an item...
         assertThat(retrievedItem).isNotNull();
@@ -53,5 +52,4 @@ public class RetrieveTest extends OkraBaseContainerTest {
         // Should throw exception because no item is scheduled / found.
         getDefaultOkra().retrieve();
     }
-
 }

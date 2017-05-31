@@ -43,11 +43,11 @@ public abstract class OkraBaseContainerTest {
 
     @Before
     public void setUp() throws UnknownHostException {
-        mongoClient =
-                new MongoClient(
-                        mongoContainer.getContainerIpAddress(),
-                        mongoContainer.getMappedPort(27017)
-                );
+        mongoClient = new MongoClient(
+                mongoContainer.getContainerIpAddress(),
+                mongoContainer.getMappedPort(27017)
+        );
+
         okraSync = (OkraSync<DefaultOkraItem>) new OkraSyncBuilder<DefaultOkraItem>()
                 .withMongo(getDefaultMongo())
                 .withDatabase("okraSimpleTests")

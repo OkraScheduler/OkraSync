@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package okra;
 
 import okra.base.model.OkraStatus;
@@ -34,7 +33,7 @@ public class CountItemsTest extends OkraBaseContainerTest {
 
     @Test
     public void countPendingItemsTest() {
-        DefaultOkraItem item = new DefaultOkraItem();
+        final DefaultOkraItem item = new DefaultOkraItem();
         item.setRunDate(LocalDateTime.now().minusHours(1));
 
         getDefaultOkra().schedule(item);

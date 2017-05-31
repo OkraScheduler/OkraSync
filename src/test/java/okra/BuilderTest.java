@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package okra;
 
 import com.mongodb.MongoClient;
@@ -31,33 +30,16 @@ public class BuilderTest {
 
     @Test(expected = InvalidOkraConfigurationException.class)
     public void builderMongoNullTest() {
-
-        new OkraSyncBuilder()
-                .withCollection("myCollection")
-                .build();
-
+        new OkraSyncBuilder().withCollection("myCollection").build();
     }
 
     @Test(expected = InvalidOkraConfigurationException.class)
     public void builderDatabaseNullTest() {
-
-        new OkraSyncBuilder()
-                .withMongo(new MongoClient())
-                .withCollection("myCollection")
-                .withDatabase(null)
-                .build();
-
+        new OkraSyncBuilder().withMongo(new MongoClient()).withCollection("myCollection").withDatabase(null).build();
     }
 
     @Test(expected = InvalidOkraConfigurationException.class)
     public void builderDatabaseEmptyTest() {
-
-        new OkraSyncBuilder()
-                .withMongo(new MongoClient())
-                .withCollection("myCollection")
-                .withDatabase("")
-                .build();
-
+        new OkraSyncBuilder().withMongo(new MongoClient()).withCollection("myCollection").withDatabase("").build();
     }
-
 }

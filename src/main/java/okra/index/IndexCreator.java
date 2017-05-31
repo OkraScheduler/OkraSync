@@ -26,6 +26,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.model.Indexes;
 import okra.base.Okra;
 import okra.base.model.OkraItem;
+import okra.base.model.index.Ordering;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +39,12 @@ public final class IndexCreator {
                                                           final MongoClient mongo,
                                                           final String database,
                                                           final String collection) {
-        okra.indexDefinitions()
+        okra.getIndexDefs()
                 .stream()
                 .map(indexDef -> {
                     final boolean ascending = indexDef.getOrdering() == null
                             || indexDef.getOrdering().equals(Ordering.ASC);
+
                     final Bson ordering = ascending
                             ? Indexes.ascending(indexDef.getAttrs()) : Indexes.descending(indexDef.getAttrs());
 

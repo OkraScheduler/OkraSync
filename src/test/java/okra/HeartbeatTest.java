@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package okra;
 
 import okra.exception.InvalidOkraItemException;
@@ -35,46 +34,53 @@ public class HeartbeatTest extends OkraBaseContainerTest {
 
     @Test
     public void heartbeatHappyDayTest() {
-        DefaultOkraItem item = new DefaultOkraItem();
+        final DefaultOkraItem item = new DefaultOkraItem();
         item.setRunDate(LocalDateTime.now().minusHours(1));
         getDefaultOkra().schedule(item);
-        Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().peek();
+
+        final Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().peek();
         assertThat(retrievedItemOpt).isPresent();
 
-        DefaultOkraItem retrievedItem = retrievedItemOpt.get();
-        Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
+        final DefaultOkraItem retrievedItem = retrievedItemOpt.get();
+        final Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
+
         assertThat(hbItem).isPresent();
         assertThat(hbItem.get().getHeartbeat()).isAfter(LocalDateTime.now().minusMinutes(1));
     }
 
     @Test(expected = InvalidOkraItemException.class)
     public void heartbeatShouldFailIfHeartbeatIsNullTest() {
-        DefaultOkraItem item = new DefaultOkraItem();
+        final DefaultOkraItem item = new DefaultOkraItem();
         item.setRunDate(LocalDateTime.now().minusHours(1));
         getDefaultOkra().schedule(item);
-        Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().peek();
+
+        final Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().peek();
         assertThat(retrievedItemOpt).isPresent();
 
-        DefaultOkraItem retrievedItem = retrievedItemOpt.get();
+        final DefaultOkraItem retrievedItem = retrievedItemOpt.get();
 
         retrievedItem.setHeartbeat(null); // here
-        Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
+        final Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
+
         assertThat(hbItem).isPresent();
         assertThat(hbItem.get().getHeartbeat()).isAfter(LocalDateTime.now().minusMinutes(1));
     }
 
     @Test
     public void heartbeatShouldFailIfHeartbeatIsNotValidIsNullTest() {
-        DefaultOkraItem item = new DefaultOkraItem();
+        final DefaultOkraItem item = new DefaultOkraItem();
         item.setRunDate(LocalDateTime.now().minusHours(1));
         getDefaultOkra().schedule(item);
-        Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().peek();
+
+        final Optional<DefaultOkraItem> retrievedItemOpt = getDefaultOkra().peek();
         assertThat(retrievedItemOpt).isPresent();
 
-        DefaultOkraItem retrievedItem = retrievedItemOpt.get();
+        final DefaultOkraItem retrievedItem = retrievedItemOpt.get();
 
         retrievedItem.setHeartbeat(LocalDateTime.now().minusMinutes(5)); // heartbeat date was modified
-        Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
+
+        final Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
+
         assertThat(hbItem).isNotPresent();
     }
 }

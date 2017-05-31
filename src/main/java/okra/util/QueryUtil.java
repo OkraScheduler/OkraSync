@@ -19,51 +19,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package okra.utils;
+package okra.util;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 import okra.base.model.OkraStatus;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
-import static com.mongodb.client.model.Filters.or;
+public final class QueryUtil {
 
-public final class QueryUtils {
+    private QueryUtil() {
+    }
 
     public static Document generateRunDateQueryPart() {
-        Document runDateQuery = new Document();
-        runDateQuery.put("status", OkraStatus.PENDING.name());
-        runDateQuery.put("runDate", new BasicDBObject("$lt", DateUtils.localDateTimeToDate(LocalDateTime.now())));
-        return runDateQuery;
+        final Document query = new Document();
+        query.put("status", OkraStatus.PENDING.name());
+        query.put("runDate", new BasicDBObject("$lt", DateUtil.toDate(LocalDateTime.now())));
+        return query;
     }
 
     public static Document generateStatusProcessingAndHeartbeatExpiredQuery(final long secondsToGetExpired) {
-        Document statusProcessingAndHeartbeatExpired = new Document();
-        statusProcessingAndHeartbeatExpired.put("status", OkraStatus.PROCESSING.name());
-        statusProcessingAndHeartbeatExpired.put("heartbeat", getExpiredHeartbeatDate(secondsToGetExpired));
-        return statusProcessingAndHeartbeatExpired;
+        final Document query = new Document();
+        query.put("status", OkraStatus.PROCESSING.name());
+        query.put("heartbeat", DateUtil.nowMinusSeconds(secondsToGetExpired));
+        return query;
     }
 
     private static Document generateStatusProcessingAndHeartbeatNullQuery() {
-        Document statusProcessingAndHeartbeatNull = new Document();
-        statusProcessingAndHeartbeatNull.put("status", OkraStatus.PROCESSING.name());
-        statusProcessingAndHeartbeatNull.put("heartbeat", null);
-        return statusProcessingAndHeartbeatNull;
+        final Document query = new Document();
+        query.put("status", OkraStatus.PROCESSING.name());
+        query.put("heartbeat", null);
+        return query;
     }
 
     public static Bson generatePeekQuery(final long secondsToGetExpired) {
-        return or(
-                QueryUtils.generateRunDateQueryPart(),
-                QueryUtils.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired),
-                QueryUtils.generateStatusProcessingAndHeartbeatNullQuery());
+        return Filters.or(
+                QueryUtil.generateRunDateQueryPart(),
+                QueryUtil.generateStatusProcessingAndHeartbeatExpiredQuery(secondsToGetExpired),
+                QueryUtil.generateStatusProcessingAndHeartbeatNullQuery());
     }
-
-    private static Date getExpiredHeartbeatDate(final long secondsToGetExpired) {
-        return DateUtils.localDateTimeToDate(LocalDateTime.now().minusSeconds(secondsToGetExpired));
-    }
-
 }

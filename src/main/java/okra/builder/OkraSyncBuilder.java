@@ -34,14 +34,14 @@ public class OkraSyncBuilder<T extends OkraItem> extends OkraBuilder<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OkraSyncBuilder.class);
 
-    private MongoClient mongoClient;
+    private MongoClient client;
 
     @Override
     public OkraSync<T> build() {
         validateConfiguration();
 
         return new OkraSyncImpl<>(
-                mongoClient,
+                client,
                 getDatabase(),
                 getCollection(),
                 getItemClass(),
@@ -53,16 +53,16 @@ public class OkraSyncBuilder<T extends OkraItem> extends OkraBuilder<T> {
     /**
      * Set mongo template that will be used by Okra
      *
-     * @param mongoClient the mongo template
+     * @param client the mongo template
      * @return this builder
      */
-    public OkraSyncBuilder<T> withMongo(final MongoClient mongoClient) {
-        this.mongoClient = Preconditions.checkConfigurationNotNull(mongoClient, "mongoClient");
+    public OkraSyncBuilder<T> withMongo(final MongoClient client) {
+        this.client = Preconditions.checkConfigurationNotNull(client, "client");
         return this;
     }
 
     private void validateConfiguration() {
-        if (mongoClient == null
+        if (client == null
                 || getCollection() == null
                 || getCollection().isEmpty()
                 || getDatabase() == null
@@ -74,7 +74,7 @@ public class OkraSyncBuilder<T extends OkraItem> extends OkraBuilder<T> {
                             "Please verify params: " +
                             "[MongoClient is null? {}, Database: {}, " +
                             "Collection: {}, ExpireTime: {}, ExpireTimeUnit: {}]",
-                    mongoClient == null, getDatabase(), getCollection(),
+                    client == null, getDatabase(), getCollection(),
                     getExpireDuration(), getExpireDurationUnit());
 
             throw new InvalidOkraConfigurationException();
