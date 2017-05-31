@@ -1,3 +1,9 @@
-.idea/
+# Folder
+
+.idea
+target
+
+# File
+
 *.iml
-target/
+.DS_Store
