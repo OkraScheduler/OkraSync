@@ -31,13 +31,12 @@ import okra.exception.InvalidOkraItemException;
 import okra.exception.OkraItemNotFoundException;
 import okra.exception.OkraRuntimeException;
 import okra.index.IndexCreator;
+import okra.serialization.DocumentSerializer;
 import okra.util.DateUtil;
 import okra.util.QueryUtil;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -47,11 +46,10 @@ import java.util.concurrent.TimeUnit;
 
 public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OkraSyncImpl.class);
-
     private final MongoClient client;
     private final Class<T> scheduleItemClass;
     private final long defaultHeartbeatExpirationMillis;
+    private final DocumentSerializer serializer;
 
     public OkraSyncImpl(final MongoClient client, final String database,
                         final String collection, final Class<T> scheduleItemClass,
@@ -61,11 +59,13 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         this.client = client;
         this.scheduleItemClass = scheduleItemClass;
         this.defaultHeartbeatExpirationMillis = defaultHeartbeatExpirationUnit.toMillis(defaultHeartbeatExpiration);
+        this.serializer = new DocumentSerializer();
         setup();
     }
 
     @Override
     public void setup() {
+        super.setup();
         IndexCreator.ensureIndexes(this, client, getDatabase(), getCollection());
     }
 
@@ -87,16 +87,16 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         final FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
         options.returnDocument(ReturnDocument.AFTER);
 
-        final Document result = client
+        final Document document = client
                 .getDatabase(getDatabase())
                 .getCollection(getCollection())
                 .findOneAndUpdate(peekQuery, new Document("$set", update), options);
 
-        if (result == null) {
+        if (document == null) {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(documentToOkraItem(result));
+        return Optional.ofNullable(serializer.fromDocument(scheduleItemClass, document));
     }
 
     @Override
@@ -108,9 +108,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     public Optional<T> reschedule(final T item) {
         validateReschedule(item);
 
-        final Document query = new Document();
-        query.put("_id", new ObjectId(item.getId()));
-        query.put("heartbeat", DateUtil.toDate(item.getHeartbeat()));
+        final Document query = serializer.toDocument(item);
 
         final Document setDoc = new Document();
         setDoc.put("heartbeat", null);
@@ -123,26 +121,23 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         final FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
         options.returnDocument(ReturnDocument.AFTER);
 
-        final Document rescheduledItem = client
+        final Document document = client
                 .getDatabase(getDatabase())
                 .getCollection(getCollection())
                 .findOneAndUpdate(query, update, options);
 
-        if (rescheduledItem == null) {
+        if (document == null) {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(documentToOkraItem(rescheduledItem));
+        return Optional.ofNullable(serializer.fromDocument(scheduleItemClass, document));
     }
 
     @Override
     public Optional<T> heartbeat(final T item) {
         validateHeartbeat(item);
 
-        final Document query = new Document();
-        query.put("_id", new ObjectId(item.getId()));
-        query.put("status", OkraStatus.PROCESSING.name());
-        query.put("heartbeat", DateUtil.toDate(item.getHeartbeat()));
+        final Document query = serializer.toDocument(item);
 
         final Document update = new Document();
         update.put("$set", new Document("heartbeat", new Date()));
@@ -159,7 +154,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(documentToOkraItem(result));
+        return Optional.ofNullable(serializer.fromDocument(scheduleItemClass, result));
     }
 
     @Override
@@ -177,9 +172,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     public void schedule(final T item) {
         validateSchedule(item);
 
-        final Document document = new Document();
-        document.append("status", OkraStatus.PENDING.name());
-        document.append("runDate", DateUtil.toDate(item.getRunDate()));
+        final Document document = serializer.toDocument(item);
 
         client.getDatabase(getDatabase())
                 .getCollection(getCollection())
@@ -189,6 +182,19 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     @Override
     public long countByStatus(final OkraStatus status) {
         final Document query = new Document("status", status.name());
+
+        return client
+                .getDatabase(getDatabase())
+                .getCollection(getCollection())
+                .count(query);
+    }
+
+    @Override
+    public long countDelayed() {
+        final Document query = new Document();
+
+        query.put("status", OkraStatus.PENDING.name());
+        query.put("runDate", new Document("$lt", DateUtil.toDate(LocalDateTime.now())));
 
         return client
                 .getDatabase(getDatabase())
@@ -215,36 +221,5 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
                 || item.getId() == null) {
             throw new InvalidOkraItemException();
         }
-    }
-
-    public long countDelayed() {
-        final Document query = new Document();
-
-        query.put("status", OkraStatus.PENDING.name());
-        query.put("runDate", new Document("$lt", DateUtil.toDate(LocalDateTime.now())));
-
-        return client
-                .getDatabase(getDatabase())
-                .getCollection(getCollection())
-                .count(query);
-    }
-
-    private T documentToOkraItem(final Document document) {
-        if (document == null) {
-            return null;
-        }
-
-        try {
-            final T item = scheduleItemClass.newInstance();
-            item.setId(document.getObjectId("_id").toString());
-            item.setHeartbeat(DateUtil.toLocalDateTime(document.getDate("heartbeat")));
-            item.setRunDate(DateUtil.toLocalDateTime(document.getDate("runDate")));
-            item.setStatus(OkraStatus.valueOf(document.getString("status")));
-            return item;
-        } catch (InstantiationException | IllegalAccessException e) {
-            LOGGER.error("Error initializing Okra Item instance", e);
-        }
-
-        return null;
     }
 }
