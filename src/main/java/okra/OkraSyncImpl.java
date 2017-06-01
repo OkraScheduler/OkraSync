@@ -108,7 +108,9 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     public Optional<T> reschedule(final T item) {
         validateReschedule(item);
 
-        final Document query = serializer.toDocument(item);
+        final Document query = new Document();
+        query.put("_id", new ObjectId(item.getId()));
+        query.put("heartbeat", DateUtil.toDate(item.getHeartbeat()));
 
         final Document setDoc = new Document();
         setDoc.put("heartbeat", null);
@@ -137,7 +139,10 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     public Optional<T> heartbeat(final T item) {
         validateHeartbeat(item);
 
-        final Document query = serializer.toDocument(item);
+        final Document query = new Document();
+        query.put("_id", new ObjectId(item.getId()));
+        query.put("status", OkraStatus.PROCESSING.name());
+        query.put("heartbeat", DateUtil.toDate(item.getHeartbeat()));
 
         final Document update = new Document();
         update.put("$set", new Document("heartbeat", new Date()));
@@ -171,6 +176,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     @Override
     public void schedule(final T item) {
         validateSchedule(item);
+        item.setStatus(OkraStatus.PENDING);
 
         final Document document = serializer.toDocument(item);
 
