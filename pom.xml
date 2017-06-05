@@ -28,7 +28,7 @@
 
     <groupId>com.github.OkraScheduler</groupId>
     <artifactId>OkraSync</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
 
     <properties>
         <java.version>1.8</java.version>

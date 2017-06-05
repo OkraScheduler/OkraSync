@@ -137,6 +137,11 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
     @Override
     public Optional<T> heartbeat(final T item) {
+        return heartbeatAndUpdateCustomAttrs(item, null);
+    }
+
+    @Override
+    public Optional<T> heartbeatAndUpdateCustomAttrs(final T item, final Map<String, Object> attrs) {
         validateHeartbeat(item);
 
         final Document query = new Document();
@@ -146,6 +151,10 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
         final Document update = new Document();
         update.put("$set", new Document("heartbeat", new Date()));
+
+        if (attrs != null && !attrs.isEmpty()) {
+            attrs.forEach((key, value) -> update.append("$set", new Document(key, value)));
+        }
 
         final FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
         options.returnDocument(ReturnDocument.AFTER);
@@ -160,11 +169,6 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
         }
 
         return Optional.ofNullable(serializer.fromDocument(scheduleItemClass, result));
-    }
-
-    @Override
-    public Optional<T> heartbeatAndUpdateCustomAttrs(final T item, final Map<String, Object> attrs) {
-        throw new OkraRuntimeException("Method not implemented yet");
     }
 
     @Override
