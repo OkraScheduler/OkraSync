@@ -26,6 +26,7 @@ import okra.model.DefaultOkraItem;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,7 +61,7 @@ public class HeartbeatTest extends OkraBaseContainerTest {
         final DefaultOkraItem retrievedItem = retrievedItemOpt.get();
 
         retrievedItem.setHeartbeat(null); // here
-        final Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeat(retrievedItem);
+        final Optional<DefaultOkraItem> hbItem = getDefaultOkra().heartbeatAndUpdateCustomAttrs(retrievedItem, new HashMap<>());
 
         assertThat(hbItem).isPresent();
         assertThat(hbItem.get().getHeartbeat()).isAfter(LocalDateTime.now().minusMinutes(1));
