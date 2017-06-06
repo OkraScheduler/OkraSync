@@ -19,53 +19,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package okra.schedule;
+package okra.heartbeat;
 
 import okra.OkraBaseContainerTest;
-import okra.base.model.OkraStatus;
 import okra.base.sync.OkraSync;
 import okra.builder.OkraSyncBuilder;
+import okra.exception.InvalidOkraItemException;
+import okra.model.DefaultOkraItem;
+import okra.schedule.CustomOkraItem;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CustomAttributeSchedulingTest extends OkraBaseContainerTest {
+public class HeartbeatWithCustomAttrsTest extends OkraBaseContainerTest {
 
-    @Test
-    public void scheduleAndPeekItemWithCustomAttr() {
+    private OkraSync<CustomOkraItem2> customOkra;
 
-        OkraSync<CustomOkraItem> customOkra = (OkraSync<CustomOkraItem>) new OkraSyncBuilder<CustomOkraItem>()
+    @Before
+    public void prepareCustomOkra() {
+        customOkra = (OkraSync<CustomOkraItem2>) new OkraSyncBuilder<CustomOkraItem2>()
                 .withMongo(getDefaultMongo())
                 .withDatabase("okraSimpleTests")
                 .withCollection("okraSync")
                 .withExpiration(5, TimeUnit.MINUTES)
-                .withItemClass(CustomOkraItem.class)
+                .withItemClass(CustomOkraItem2.class)
                 .build();
+    }
 
-        CustomOkraItem item = new CustomOkraItem();
-        item.setRunDate(LocalDateTime.now().minusMinutes(5));
-        item.setSomeCustomStringValue("hello");
-        item.setSomeCustomValue(10L);
-
+    @Test
+    public void heartbeatHappyDayTest() {
+        final CustomOkraItem2 item = new CustomOkraItem2();
+        item.setRunDate(LocalDateTime.now().minusHours(1));
+        item.setSomeCustomValue(20L);
         customOkra.schedule(item);
 
-        Optional<CustomOkraItem> retrievedItemOpt = customOkra.peek();
-
+        final Optional<CustomOkraItem2> retrievedItemOpt = customOkra.peek();
         assertThat(retrievedItemOpt).isPresent();
 
-        CustomOkraItem retrievedItem = retrievedItemOpt.get();
+        final CustomOkraItem2 retrievedItem = retrievedItemOpt.get();
 
-        assertThat(retrievedItem.getId()).isNotNull();
-        assertThat(retrievedItem.getSomeCustomValue()).isEqualTo(10L);
-        assertThat(retrievedItem.getSomeCustomStringValue()).isEqualTo("hello");
-        assertThat(retrievedItem.getHeartbeat()).isNotNull();
-        assertThat(retrievedItem.getRunDate()).isNotNull();
-        assertThat(retrievedItem.getStatus()).isEqualTo(OkraStatus.PROCESSING);
+        assertThat(retrievedItem.getSomeCustomValue()).isEqualTo(20L);
+
+        Map<String, Object> customAttrs = new HashMap<>();
+        customAttrs.put("someCustomValue", 77L);
+
+        final Optional<CustomOkraItem2> hbItem = customOkra
+                .heartbeatAndUpdateCustomAttrs(retrievedItem, customAttrs);
+
+        assertThat(hbItem).isPresent();
+        assertThat(hbItem.get().getHeartbeat()).isAfter(LocalDateTime.now().minusMinutes(1));
+        assertThat(hbItem.get().getSomeCustomValue()).isEqualTo(77L);
     }
 
 }
