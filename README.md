@@ -14,6 +14,11 @@ This is the fastest synchronous Okra implementation ever made.
 
 Pull Requests are always welcome! We will always review and accept them really fast.
 
+## Getting Started
+
+See how to get started in the project wiki
+https://github.com/OkraScheduler/OkraSync/wiki/Getting-Started
+
 ## Dependency
 
 ### Gradle
