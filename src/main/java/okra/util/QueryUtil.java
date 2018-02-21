@@ -44,7 +44,7 @@ public final class QueryUtil {
     public static Document generateStatusProcessingAndHeartbeatExpiredQuery(final long secondsToGetExpired) {
         final Document query = new Document();
         query.put("status", OkraStatus.PROCESSING.name());
-        query.put("heartbeat", DateUtil.nowMinusSeconds(secondsToGetExpired));
+        query.put("heartbeat", new BasicDBObject("$lt", DateUtil.nowMinusSeconds(secondsToGetExpired)));
         return query;
     }
 

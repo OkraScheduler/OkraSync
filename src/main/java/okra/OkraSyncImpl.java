@@ -29,7 +29,6 @@ import okra.base.model.OkraStatus;
 import okra.base.sync.AbstractOkraSync;
 import okra.exception.InvalidOkraItemException;
 import okra.exception.OkraItemNotFoundException;
-import okra.exception.OkraRuntimeException;
 import okra.index.IndexCreator;
 import okra.serialization.DocumentSerializer;
 import okra.util.DateUtil;
@@ -37,6 +36,8 @@ import okra.util.QueryUtil;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -50,6 +51,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
     private final Class<T> scheduleItemClass;
     private final long defaultHeartbeatExpirationMillis;
     private final DocumentSerializer serializer;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OkraSyncImpl.class);
 
     public OkraSyncImpl(final MongoClient client, final String database,
                         final String collection, final Class<T> scheduleItemClass,
@@ -78,8 +80,7 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
     @Override
     public Optional<T> peek() {
-        final Bson peekQuery = QueryUtil.generatePeekQuery(defaultHeartbeatExpirationMillis);
-
+        final Bson peekQuery = QueryUtil.generatePeekQuery(defaultHeartbeatExpirationMillis / 1000);
         final Document update = new Document();
         update.put("heartbeat", new Date());
         update.put("status", OkraStatus.PROCESSING.name());
