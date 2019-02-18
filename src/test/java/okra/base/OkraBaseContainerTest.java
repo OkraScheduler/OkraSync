@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Okra Scheduler
+ * Copyright (c) 2019 Okra Scheduler
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package okra;
+package okra.base;
 
 import com.mongodb.MongoClient;
 import okra.base.sync.OkraSync;

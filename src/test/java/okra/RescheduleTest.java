@@ -21,6 +21,7 @@
  */
 package okra;
 
+import okra.base.OkraBaseContainerTest;
 import okra.base.model.OkraStatus;
 import okra.exception.InvalidOkraItemException;
 import okra.model.DefaultOkraItem;

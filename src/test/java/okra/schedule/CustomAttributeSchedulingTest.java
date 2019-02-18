@@ -22,7 +22,7 @@
 
 package okra.schedule;
 
-import okra.OkraBaseContainerTest;
+import okra.base.OkraBaseContainerTest;
 import okra.base.model.OkraStatus;
 import okra.base.sync.OkraSync;
 import okra.builder.OkraSyncBuilder;

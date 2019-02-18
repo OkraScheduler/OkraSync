@@ -21,6 +21,7 @@
  */
 package okra;
 
+import okra.base.OkraBaseContainerTest;
 import okra.exception.OkraItemNotFoundException;
 import okra.model.DefaultOkraItem;
 import org.junit.Test;

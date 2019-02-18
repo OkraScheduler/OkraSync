@@ -21,12 +21,9 @@
  */
 package okra.heartbeat;
 
-import okra.OkraBaseContainerTest;
+import okra.base.OkraBaseContainerTest;
 import okra.base.sync.OkraSync;
 import okra.builder.OkraSyncBuilder;
-import okra.exception.InvalidOkraItemException;
-import okra.model.DefaultOkraItem;
-import okra.schedule.CustomOkraItem;
 import org.junit.Before;
 import org.junit.Test;
 
