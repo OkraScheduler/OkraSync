@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class OkraBaseContainerTest {
 
     @ClassRule
-    public static GenericContainer mongoContainer = new GenericContainer("mongo:3.4").withExposedPorts(27017);
+    public static GenericContainer mongoContainer = new GenericContainer("mongo:4").withExposedPorts(27017);
 
     private OkraSync<DefaultOkraItem> okra;
     private MongoClient mongoClient;
