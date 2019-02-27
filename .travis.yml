@@ -13,7 +13,7 @@ before_install:
   - sudo apt-get update -qq
   - env
 # Pre-fetch docker images - seems to need to be done before docker env vars are set
-  - docker pull mongo:3.4
+  - docker pull mongo:4
 # Update env vars required by testcontainers
   - export DOCKER_HOST=tcp://127.0.0.1:2375
   - export DOCKER_TLS_VERIFY=0
