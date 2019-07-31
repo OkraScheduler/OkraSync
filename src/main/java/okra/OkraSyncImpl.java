@@ -24,6 +24,7 @@ package okra;
 import com.mongodb.MongoClient;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Sorts;
 import okra.base.model.OkraItem;
 import okra.base.model.OkraStatus;
 import okra.base.sync.AbstractOkraSync;
@@ -87,7 +88,8 @@ public class OkraSyncImpl<T extends OkraItem> extends AbstractOkraSync<T> {
 
         final FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
         options.returnDocument(ReturnDocument.AFTER);
-
+        options.sort(Sorts.ascending("runDate"));
+        
         final Document document = client
                 .getDatabase(getDatabase())
                 .getCollection(getCollection())
