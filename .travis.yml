@@ -1,8 +1,7 @@
 language: java
 jdk:
-  - oraclejdk8
-  - oraclejdk9
-  - oraclejdk11
+  - openjdk8
+  - openjdk9
   - openjdk11
 
 sudo: required
@@ -12,9 +11,9 @@ services:
 before_install:
   - sudo apt-get update -qq
   - env
-# Pre-fetch docker images - seems to need to be done before docker env vars are set
+  # Pre-fetch docker images - seems to need to be done before docker env vars are set
   - docker pull mongo:4
-# Update env vars required by testcontainers
+  # Update env vars required by testcontainers
   - export DOCKER_HOST=tcp://127.0.0.1:2375
   - export DOCKER_TLS_VERIFY=0
   - env
