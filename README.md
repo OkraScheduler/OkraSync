@@ -1,7 +1,7 @@
 # Okra
 
 Okra implementation using synchronous MongoDB Java Driver.
-This is the fastest synchronous Okra implementation ever made.
+This is the fastest Okra implementation for now.
 
 [![Build Status][travis-badge]][travis-url] [![Code Coverage][codecov-badge]][codecov-url] [![Artifacts][jitpack-badge]][jitpack-url]
 
